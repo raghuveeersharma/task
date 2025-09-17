@@ -1,158 +1,283 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import TableRow from "../components/TableRow.js";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import AddUsers from "../components/AddUsers.js";
-import { v4 as uuidv4 } from "uuid";
-import type {user} from "../constants/types.js"
-type Counts = {
-  teen: number;
-  adult: number;
-  old: number;
-};
-
-
+import type { User, Counts } from "../constants/types.js";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar.js";
 
 const Home = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [blur, setBlur] = useState(false);
-  const [persons, setPersons] = useState<user[]>([
-    { id: uuidv4(), name: "Raj", age: 22 },
-    { id: uuidv4(), name: "Ravi", age: 33 },
-    { id: uuidv4(), name: "Sneha", age: 14 },
-    { id: uuidv4(), name: "Amit", age: 40 },
-    { id: uuidv4(), name: "Priya", age: 17 },
-    { id: uuidv4(), name: "John", age: 29 },
-    { id: uuidv4(), name: "Anita", age: 25 },
-    { id: uuidv4(), name: "Vikram", age: 13 },
-    { id: uuidv4(), name: "Sara", age: 23 },
-    { id: uuidv4(), name: "Nikhil", age: 80 },
-  ]);
+  const [persons, setPersons] = useState<User[]>(() => {
+    const saved = localStorage.getItem("persons");
+    return saved
+      ? JSON.parse(saved)
+      : [
+          {
+            id: "1a2b3c4d-5678-90ab-cdef-1234567890ab",
+            name: "Raj",
+            last_name: "Kumar",
+            age: 22,
+          },
+          {
+            id: "2b3c4d5e-6789-01bc-def0-2345678901bc",
+            name: "Anita",
+            last_name: "Sharma",
+            age: 28,
+          },
+          {
+            id: "3c4d5e6f-7890-12cd-ef01-3456789012cd",
+            name: "Amit",
+            last_name: "Verma",
+            age: 31,
+          },
+          {
+            id: "4d5e6f70-8901-23de-f012-4567890123de",
+            name: "Pooja",
+            last_name: "Singh",
+            age: 25,
+          },
+          {
+            id: "5e6f7081-9012-34ef-0123-5678901234ef",
+            name: "Vikram",
+            last_name: "Patel",
+            age: 29,
+          },
+          {
+            id: "6f708192-0123-45f0-1234-6789012345f0",
+            name: "Sonia",
+            last_name: "Reddy",
+            age: 27,
+          },
+        ];
+  });
+  const navigate = useNavigate();
+  useEffect(() => {
+    localStorage.setItem("persons", JSON.stringify(persons));
+  }, [persons]);
+  const [query, setQuery] = useState<{
+    name: string;
+    status?: boolean | null;
+    arr: User[];
+  }>({
+    name: "",
+    status: false,
+    arr: persons || [],
+  });
 
-  function handelAdd(data:user) {
-    try {
-      setPersons([...persons, { id: uuidv4(), name: data.name, age: data.age }]);
-      setIsOpen(false);
-      // toast.success("new user created successfully!! ");
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  function handelOpenAdd() {
-    setIsOpen(!isOpen);
-    setBlur(!blur);
-  }
-  function handelBlur() {
-    setBlur(!blur);
-  }
+  const handelAdd = useCallback(
+    (data: User) => {
+      // try {
+      //   setPersons([
+      //     ...persons,
+      //     { id: uuidv4(), name: data.name ?? "", age: data.age ?? 0 },
+      //   ]);
+      //   setIsOpen(false);
+      //   toast.success("new user created successfully!! ");
+      // } catch (error) {
+      //   console.log(error);
+      // }
+    },
+    [persons]
+  );
 
-  function handelDelete(id:string) {
+  const handelOpenAdd = useCallback(() => {
+    setIsOpen((prev) => !prev);
+    setBlur((prev) => !prev);
+  }, []);
+  const handelBlur = useCallback(() => {
+    setBlur((prev) => !prev);
+  }, []);
+  console.log("home");
+
+  const handelDelete = useCallback((id: string) => {
     try {
       if (!window.confirm("are you sure want to delete this record!!!")) return;
       const filteredData = persons.filter((item) => item.id != id);
       setPersons(filteredData);
-      // toast.success("user deleted succesfully");
+      toast.success("user deleted succesfully");
     } catch (error) {
       console.log(error);
     }
-  }
-  function handelUpdate(id: string, user: { name: string; age: number | null }) {
-    try {
-      const updatedUser = persons.map((item) =>
-        item.id === id ? { id: id, name: user.name, age: user.age } : item
-      );
-      setPersons(updatedUser);
-      // toast.success("user deleted sucessfully");
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  const counts = persons.reduce<Counts>(
-    (acc, person) => {
-      if(person.age===null)return acc;
-      if (person.age < 18) {
-        acc.teen++;
-      } else if (person.age > 60) {
-        acc.old++;
-      } else {
-        acc.adult++;
+  }, []);
+  const handelUpdate = useCallback(
+    (id: string, user: { name: string; age: number | null }) => {
+      // try {
+      //   const updatedUser = persons.map((item) =>
+      //     item.id === id ? { id: id, name: user.name, age: user.age } : item
+      //   );
+      //   setPersons(updatedUser);
+      //   toast.success("user deleted sucessfully");
+      // } catch (error) {
+      //   console.log(error);
+      // }
+    },
+    [persons]
+  );
+  const counts = useMemo((): Counts => {
+    const initialCounts: Counts = { teen: 0, adult: 0, old: 0 };
+    const result = persons.reduce((acc, person) => {
+      console.log("counting ages");
+      if (person.age !== null) {
+        if (person.age < 18) {
+          acc.teen += 1;
+        } else if (person.age >= 18 && person.age < 60) {
+          acc.adult += 1;
+        } else {
+          acc.old += 1;
+        }
       }
       return acc;
-    },
-    { teen: 0, adult: 0, old: 0 }
-  );
-  const boxClasses =
-    "flex flex-col items-center justify-center text-gray-600 shadow-lg shadow-gray-400 hover-border-green-600 hover:shadow-gray-600 hover:text-gray-800  hover:scale-105 duration-500 space-y-1 rounded-full border-2 size-24 border-green-400";
-  return (
-    <div className="min-h-screen relative px-40 pt-14 pb-8 bg-gradient-to-b from-green-100 to-green-400">
-      <div
-        className={`absolute inset-0 ${
-          blur ? "bg-green-200 opacity-55" : ""
-        } pointer-events-none`}
-      ></div>
+    }, initialCounts);
+    return result;
+  }, [persons]);
+  useEffect(() => {
+    if (query.status) {
+      setPersons(query.arr);
+    } else {
+      const saved = localStorage.getItem("persons");
+      setPersons(saved ? JSON.parse(saved) : []);
+    }
+  }, []);
 
-      <div className="px-20 flex flex-col  items-center">
-        <div className="flex justify-around items-center mb-3 text-center w-[100%]">
-          <div className={boxClasses}>
-            Teens
-            <span>{counts.teen}</span>
-          </div>
-          <div className={boxClasses}>
-            Adults <span>{counts.adult}</span>
-          </div>
-          <div className={boxClasses}>
-            Olds <span>{counts.old}</span>
-          </div>
-        </div>
+  const handleSearch = (query: string, arr: User[]) => {
+    try {
+      const result = arr.filter((item) => {
+        return item.name
+          .toLowerCase()
+          .concat(item.last_name.toLowerCase())
+          .includes(query.toLowerCase());
+      });
+      setQuery((prev) => ({ ...prev, arr: result }));
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const boxClasses =
+    "flex flex-col items-center justify-center text-soft shadow-lg shadow-gray-600 hover:shadow-gray-600  duration-500 space-y-1 rounded-full border-2 size-16 lg:size-24 border-success";
+  return (
+    <>
+      <div className="min-h-screen relative px-3 md:px-40 pt-6 bg-base-100">
         <div
-          className="bg-green-500 p-2 hover:bg-green-600 text-xl duration-300 gap-2 flex items-center justify-center text-white rounded-lg"
-          onClick={() => {
-            handelOpenAdd();
-          }}
-        >
-          {" "}
-          <button className="">Add Data </button>
-          <span className="size-4 mb-1">
-            <IoIosAddCircleOutline />
-          </span>
-        </div>
-        <h1 className="text-lg font-bold mx-auto tracking-wide underline mt-2 ">
-          Here's The Data <span className="">...</span>
-        </h1>
-        <div className="flex gap-8 text-white text-center mt-2 text-l ">
-          <h1 className="bg-green-500 w-20 hover:bg-green-600 rounded-xl">
-            S.NO
-          </h1>
-          <h1 className="bg-green-500 w-20 hover:bg-green-600 rounded-xl">
-            Name
-          </h1>
-          <h1 className="bg-green-500 w-20 hover:bg-green-600 rounded-xl">
-            Age
-          </h1>
-          <h1 className="bg-green-500 w-28 hover:bg-green-600 rounded-xl">
-            Category
-          </h1>
-        </div>
-        <div>
-          {persons.map((item, index) => (
-            <div key={index + 1} className="mt-8 shadow-md shadow-gray-600 ">
-              <TableRow
-                data={item}
-                index={index + 1}
-                handelDelete={handelDelete}
-                handelUpdate={handelUpdate}
-                setBlur={handelBlur}
-              />
+          className={`absolute inset-0 ${
+            blur ? "bg-black opacity-45" : ""
+          } pointer-events-none`}
+        ></div>
+
+        <div className="md:px-20 px-16 flex flex-col justify-center items-center">
+          <div className="mb-5">
+            <div>
+              <label className="input">
+                <input
+                  type="search"
+                  value={query.name}
+                  required
+                  placeholder="Search"
+                  onChange={(e) => {
+                    if (e.target.value.length === 0) {
+                      setQuery({ name: "", status: false, arr: persons });
+                      return;
+                    }
+                    setQuery((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                      status: true,
+                    }));
+                    handleSearch(e.target.value, persons);
+                  }}
+                />
+              </label>
             </div>
-          ))}
+          </div>
+          <div className="flex lg:gap-32 gap-4 text-xs lg:text-lg justify-center items-center mb-3 text-center w-[100%]">
+            <div className={boxClasses}>
+              Teens
+              <span>{counts.teen}</span>
+            </div>
+            <div className={boxClasses}>
+              Adults <span>{counts.adult}</span>
+            </div>
+            <div className={boxClasses}>
+              Olds <span>{counts.old}</span>
+            </div>
+          </div>
+          <div
+            className="btn btn-success p-2 text-base duration-300 flex items-center justify-center rounded-lg"
+            onClick={() => {
+              navigate("/create");
+              // handelOpenAdd();
+            }}
+          >
+            {" "}
+            <button className="">Add Data </button>
+            <span className="size-4">
+              <IoIosAddCircleOutline />
+            </span>
+          </div>
+          <h1 className="text-lg font-bold mx-auto tracking-wide underline mt-2 ">
+            Here's The Data <span className="">...</span>
+          </h1>
+          <div className="flex md:gap-8 gap-4 text-white text-center mt-2 text-l px-5">
+            <h1 className="btn btn-success rounded-xl">S.NO</h1>
+            <h1 className="btn btn-success rounded-xl">Name</h1>
+            <h1 className="btn btn-success rounded-xl">Age</h1>
+            <h1 className="btn btn-success rounded-xl">Category</h1>
+          </div>
+          <div className="max-w-screen-lg">
+            {query.status ? (
+              <div>
+                {query.arr.map((item, index) => (
+                  <div
+                    key={index + 1}
+                    className="mt-8 shadow-md shadow-gray-600 "
+                  >
+                    <TableRow
+                      data={item}
+                      fullName={item.name + " " + item.last_name}
+                      index={index + 1}
+                      handelDelete={handelDelete}
+                      handelUpdate={handelUpdate}
+                      setBlur={handelBlur}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>
+                {persons.map((item, index) => (
+                  <div
+                    key={index + 1}
+                    className="mt-8 shadow-md shadow-gray-600 "
+                  >
+                    <TableRow
+                      data={item}
+                      fullName={item.name}
+                      index={index + 1}
+                      handelDelete={handelDelete}
+                      handelUpdate={handelUpdate}
+                      setBlur={handelBlur}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+        {isOpen && (
+          <div className="absolute top-[20%] z-10 lg:left-[35%] left-[20%] shadow-2xl shadow-gray-900">
+            {/* <AddUsers
+              open={handelOpenAdd}
+              handelAdd={handelAdd}
+              setBlur={setBlur}
+            /> */}
+          </div>
+        )}
       </div>
-      {isOpen && (
-        <div className="absolute top-[20%] z-10 left-[35%] shadow-2xl shadow-gray-900">
-          <AddUsers open={handelOpenAdd} handelAdd={handelAdd} setBlur={setBlur} />
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
