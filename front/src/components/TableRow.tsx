@@ -1,48 +1,57 @@
-import { useState } from "react";
+import React, { useCallback, useEffect, useState, type JSX } from "react";
 import MarkStatus from "./MarkStatus.js";
 import DetailBox from "./DetailBox.js";
-import type {user as User } from "../constants/types.js"
+import type { TableRowProps } from "../constants/types.js";
+import { useNavigate } from "react-router-dom";
 
-type TableRowProps = {
-  data: User;
-  index: number;
-  handelDelete: (id: string) => void;
-  setBlur: () => void;
-  handelUpdate: (id: string, user: { name: string; age: number | null }) => void;
-};
-
-const TableRow:React.FC<TableRowProps> = ({ data, index, handelDelete, setBlur, handelUpdate }) => {
+const TableRow: React.FC<TableRowProps> = ({
+  data,
+  fullName,
+  index,
+  handelDelete,
+  setBlur,
+  handelUpdate,
+}): JSX.Element => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  function handelOpen() {
-    setIsOpen(!isOpen);
+  const handelOpen = useCallback(() => {
+    setIsOpen((prev) => !prev);
     setBlur();
+  }, []);
+  useEffect(() => {
+    console.log("mounted tablerow");
+    return () => {
+      console.log("unmounted tablerow");
+    };
+  }, []);
+  function handleNavigate() {
+    navigate(`/detail/${data.id}`);
   }
-
+  console.log("rendered tablerow");
   return (
-    <div className="">
+    <div className="w-[100%]   flex justify-center">
       <div
-        className="px-20 flex flex-col justify-center"
+        className="lg:px-16 px-0 flex flex-col w-[80%] justify-center"
         onClick={() => {
-          handelOpen();
+          handleNavigate();
         }}
       >
-        <div className="flex gap-8 text-center hover:scale-105 duration-300">
+        <div className="flex md:gap-14 gap-9 text-center text-soft hover:scale-105 duration-300">
           <h1 className="w-20 rounded-xl">{index}</h1>
-          <h1 className="w-20 rounded-xl">{data.name}</h1>
+          <h1 className="w-20 rounded-xl">{fullName}</h1>
           <h1 className="w-20 rounded-xl">{data.age}</h1>
           <h1 className="w-20 rounded-xl">
-            <MarkStatus age={data.age} />
+            <MarkStatus age={data.age ?? null} />
           </h1>
         </div>
       </div>
       {isOpen && (
-        <div className="absolute top-[20%] left-[40%] shadow-xl shadow-green-200">
+        <div className="absolute top-[20%] left-[20%] lg:left-[35%] shadow-2xl shadow-gray-900">
           <DetailBox
-            id={data.id}
-            namee={data.name}
-            agee={data.age}
+            id={data.id ?? ""}
+            namee={data.name ?? ""}
+            agee={data.age ?? null}
             open={handelOpen}
-            setBlur={setBlur}
             handelDelete={handelDelete}
             handelUpdate={handelUpdate}
           />
@@ -52,4 +61,4 @@ const TableRow:React.FC<TableRowProps> = ({ data, index, handelDelete, setBlur, 
   );
 };
 
-export default TableRow;
+export default React.memo(TableRow);

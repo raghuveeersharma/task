@@ -1,81 +1,76 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { ImCross } from "react-icons/im";
 import { FaCheck } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import type { user } from "../constants/types.js"
-type users = user &{
-  status:boolean;
-}
-type DetailBoxProps={
-  id:string,
-  namee:string,
-  agee:number|null,
-  open:()=>void,
-  setBlur:()=>void,
-  handelDelete:(id:string)=>void,
-  handelUpdate:(id:string,user:{name:string,age:number|null})=>void
-}
+import type { User, DetailBoxProps } from "../constants/types.js";
 
-const DetailBox:React.FC<DetailBoxProps> = ({
+const DetailBox: React.FC<DetailBoxProps> = ({
   id,
   namee,
   agee,
   open,
-  setBlur,
   handelDelete,
   handelUpdate,
 }) => {
-  const [form, setForm] = useState<Omit<users,"id">>({
+  const [form, setForm] = useState<Omit<User, "id">>({
     name: namee,
     age: agee,
     status: false,
   });
   function handleClose() {
-    setBlur();
-    console.log(false);
     open();
   }
+  useEffect(() => {
+    console.log("mounted detail box");
+    return () => {
+      console.log("unmounted detail box");
+    };
+  }, []);
+  const handelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "age" ? (value === "" ? null : Number(value)) : value,
+      status: true,
+    }));
+  };
+  console.log("detail box");
   return (
-    <div className="min-h-60 card w-72 mx-auto bg-gradient-to-b from-green-400 to-green-800 z-20 text-white relative rounded-xl border border-green-400">
-      <div className=" card-body flex flex-col gap-y-3">
-        <div className="">
+    <div className="min-h-64 card lg:w-96 w-60 mx-auto bg-neutral z-20 text-gray-100 relative rounded-xl border-2 border-green-300">
+      <div className=" card-body flex flex-col justify-center lg:text-xl text-base gap-y-3">
+        <div className="md:text-base text-xs">
           <label>ID:</label>
           <p>{id}</p>
-          <hr className="text-white h-1 w-52" />
+          <hr className="text-whit)}, [e h-1 lg:w-80 w-52" />
         </div>
         <div className="flex flex-col">
           <label>NAME:</label>
           <input
             type="text"
+            name="name"
             value={form.name}
             autoFocus
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value, status: true })
-            }
+            onChange={(e) => handelChange(e)}
             className="outline-none"
           />
-          <hr className="text-white h-1 w-52" />
+          <hr className="text-white h-1 lg:w-80 w-52" />
         </div>
         <div className="flex flex-col">
           <label>AGE:</label>
 
           <input
+            name="age"
             type="number"
-            value={form.age??""}
-            onChange={(e) =>
-              setForm({ ...form, age: e.target.value===""?null:Number(e.target.value), status: true })
-            }
+            value={form.age ?? ""}
+            onChange={handelChange}
             className="outline-none"
           />
-          <hr className="text-white h-1 w-52" />
+          <hr className="text-white h-1 lg:w-80 w-52" />
         </div>
         <div className="card-actions flex justify-between mt-5">
           {form.status ? (
-            <button
-              className="btn btn-warning"
-              onClick={handleClose}
-            >
+            <button className="btn btn-warning" onClick={() => handleClose()}>
               Cancel
               <span>
                 <IoMdArrowBack className="size-5" />
@@ -84,7 +79,7 @@ const DetailBox:React.FC<DetailBoxProps> = ({
           ) : (
             <button
               className="btn btn-active btn-neutral"
-              onClick={handleClose}
+              onClick={() => handleClose()}
             >
               CLOSE{" "}
               <span>
@@ -125,4 +120,4 @@ const DetailBox:React.FC<DetailBoxProps> = ({
   );
 };
 
-export default DetailBox;
+export default React.memo(DetailBox);
