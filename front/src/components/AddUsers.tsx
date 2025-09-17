@@ -8,7 +8,7 @@ const AddUsers: React.FC<AddUsersProps> = ({
   handelAdd,
   setBlur,
 }): ReactNode => {
-  const [data, setData] = useState<User>({
+  const [data, setData] = useState<Omit<User, "last_name">>({
     id: uuidv4(),
     name: "",
     age: null,

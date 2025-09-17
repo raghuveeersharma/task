@@ -13,7 +13,7 @@ const DetailBox: React.FC<DetailBoxProps> = ({
   handelDelete,
   handelUpdate,
 }) => {
-  const [form, setForm] = useState<Omit<User, "id">>({
+  const [form, setForm] = useState<Omit<User, "id" | "last_name">>({
     name: namee,
     age: agee,
     status: false,
