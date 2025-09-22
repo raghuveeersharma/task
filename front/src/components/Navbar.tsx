@@ -6,24 +6,24 @@ const Navbar = () => {
   console.log("navbar");
   return (
     <div className=" h-16 w-[100%] flex items-center navbar bg-success  shadow-gray-300">
-      <div className="mx-auto w-[80%]">
-        <div className="flex justify-between lg:gap-80 gap-10 md:gap-40 ">
+      <div className="mx-auto w-[80%] ">
+        <div className="flex justify-between lg:gap-80 gap-4 sm:gap-8 md:gap-32 ">
           <div
             className="md:text-3xl text-xl tracking-wider font-bold"
             onClick={() => navigate("/")}
           >
             DataWala
           </div>
-          <div>
+          <div className="space-x-1">
             <ThemeSelector />
+            <a
+              href="https://github.com/raghuveeersharma/task.git"
+              target="__blank"
+              className="btn btn-soft btn-accent md:text-xl text-lg"
+            >
+              <span>Github</span>
+            </a>
           </div>
-          <a
-            href="https://github.com/raghuveeersharma/task.git"
-            target="__blank"
-            className="btn btn-soft btn-accent md:text-xl text-lg"
-          >
-            <span>Github</span>
-          </a>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 export interface User{
-  id:string
+  _id?:number
   name:string
   last_name:string
   age:number|null
@@ -15,12 +15,6 @@ export type TableRowProps = {
   data: User;
   fullName?:string;
   index: number;
-  handelDelete: (id: string) => void;
-  setBlur: () => void;
-  handelUpdate: (
-    id: string,
-    user: { name: string; age: number | null }
-  ) => void;
 };
 
 export type DetailBoxProps = {
@@ -45,5 +39,10 @@ export interface Theme{
   label:string,
   colors:[string,string,string,string]
 
+}
+export interface query{
+  name:string,
+  status:boolean|null,
+  arr:User[]
 }
 

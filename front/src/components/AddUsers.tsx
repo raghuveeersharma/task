@@ -1,15 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ImCross } from "react-icons/im";
-import { v4 as uuidv4 } from "uuid";
 import type { User, AddUsersProps } from "../constants/types.js";
 
-const AddUsers: React.FC<AddUsersProps> = ({
-  open,
-  handelAdd,
-  setBlur,
-}): ReactNode => {
+const AddUsers: React.FC<AddUsersProps> = ({ open, setBlur }): ReactNode => {
   const [data, setData] = useState<Omit<User, "last_name">>({
-    id: uuidv4(),
     name: "",
     age: null,
   });
@@ -58,7 +52,7 @@ const AddUsers: React.FC<AddUsersProps> = ({
         <button
           className="bg-success hover:bg-gray-200 text-black duration-300 mt-3 rounded-lg mx-auto h-12 w-20"
           onClick={() => {
-            handelAdd(data);
+            // handelAdd(data);
             setBlur(false);
           }}
         >

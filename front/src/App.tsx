@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar.js";
 import { useThemeStore } from "./store/useThemeStore.js";
 import { Outlet } from "react-router-dom";
@@ -7,6 +8,7 @@ const App = () => {
   return (
     <div className="overflow-x-hidden text-soft" data-theme={theme}>
       <Navbar />
+      <Toaster />
       <main>
         <Outlet />
       </main>

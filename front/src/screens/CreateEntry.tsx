@@ -1,43 +1,28 @@
 import { useNavigate } from "react-router-dom";
 import type { User } from "../constants/types.js";
-import { v4 as uuidv4 } from "uuid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BiLeftArrow } from "react-icons/bi";
+import { toast } from "react-hot-toast";
+import { api } from "../utils/axios.js";
 
 const CreateEntry = () => {
   const navigate = useNavigate();
-  const [array, setArray] = useState<User[]>([]);
   const [data, setData] = useState<User>({
-    id: uuidv4(),
     name: "",
     last_name: "",
     age: null,
   });
-  useEffect(() => {
-    const res = JSON.parse(localStorage.getItem("persons") || "[]");
-    setArray(res);
-  }, []);
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      const { name, last_name } = data;
-      if (
-        array.find(
-          (item) =>
-            item.name.toLowerCase() === name.toLowerCase() &&
-            item.last_name.toLowerCase() === last_name.toLowerCase()
-        )
-      ) {
-        alert("Duplicate Entry Not Allowed");
-        return;
-      }
-      const newData = [...array, data];
-      localStorage.setItem("persons", JSON.stringify(newData));
+      const { name, last_name, age } = data;
+      const fullName = name + " " + last_name;
+      await api.post("/user", { name: fullName, age: age });
+      toast.success("user created successfully!!");
       navigate(-1);
     } catch (error) {
-      console.log(error);
+      console.log("error in creating user", error);
     }
   };
-  console.log("new", array);
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-base-300">
       <h1 className="text-xl md:text-2xl text-success mb-6">
