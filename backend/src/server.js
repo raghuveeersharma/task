@@ -9,7 +9,7 @@ dotenv.config();
 
 app.use(
   cors({
-    origin: "https://task-five-gold.vercel.app/",
+    origin: "https://task-five-gold.vercel.app",
   })
 );
 app.use(express.json());
