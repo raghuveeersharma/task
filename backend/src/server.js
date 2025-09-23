@@ -9,14 +9,14 @@ dotenv.config();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://task-five-gold.vercel.app/",
   })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", router);
-
-app.listen(4000, () => {
-  console.log(`Server is running on http://localhost:4000`);
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
   db();
 });
