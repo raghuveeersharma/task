@@ -1,6 +1,8 @@
 import axios from "axios";
 
+const server_url=`https://task-4e1n.onrender.com`
+
 export const api=axios.create({
-    baseURL:"http://localhost:4000/api/auth/",
+    baseURL:`${server_url}/api/auth/`,
     timeout:7000
 })
